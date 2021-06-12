@@ -33,8 +33,8 @@ local function get_snippet_list()
             })
         end
     end
-
-    if vim.bo.filetype ~= '' then --making sure filetype is there or else error
+    --making sure filetype is there or else error
+    if vim.bo.filetype ~= '' and snippet.snippets[vim.bo.filetype] ~= nil then
         loopcreate(snip_list,vim.bo.filetype)
     end
     loopcreate(snip_list,'_global')
@@ -42,7 +42,7 @@ local function get_snippet_list()
 end
 
 local function show_preview(entry,buf)
-    vim.api.nvim_buf_set_option(buf, "filetype", "snippets")
+    vim.api.nvim_buf_set_option(buf, "filetype", entry.value.filetype)
     local snip = snippet.lookup_snippet(entry.value.filetype,entry.value.name)
     local ux = require'snippets/inserters/vim_input'
 

@@ -32,3 +32,5 @@ and to run it
 
 I got inspire by [telescope-ultisnips.nvim](https://github.com/fhill2/telescope-ultisnips.nvim)
 Although it may not be much but I figure I should create similar one with currently snippets I am using while learning how to make plugins and lua for a first time.
+
+It is not perfect, there is quite a few problem that could cause but I have no idea how to face it
