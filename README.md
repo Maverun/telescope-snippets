@@ -28,6 +28,7 @@ and to run it
 :Telescope snippets
 ```
 
-#Inspire
+# Inspire
+
 I got inspire by [telescope-ultisnips.nvim](https://github.com/fhill2/telescope-ultisnips.nvim)
 Although it may not be much but I figure I should create similar one with currently snippets I am using while learning how to make plugins and lua for a first time.
