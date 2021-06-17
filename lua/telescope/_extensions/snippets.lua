@@ -1,4 +1,4 @@
--- Copyright (C) Maverun 2021
+ --Copyright (C) Maverun 2021
 local has_telescope, telescope = pcall(require, "telescope")
 local has_snippet, snippet = pcall(require,"snippets")
 if not has_telescope then
@@ -14,13 +14,7 @@ local pickers = require("telescope.pickers")
 local previewers = require("telescope.previewers")
 local entry_display = require("telescope.pickers.entry_display")
 local conf = require("telescope.config").values
-
-
-local function print_table(tb)
-    for k,v in pairs(tb) do
-        print(k,'---',v,type(v))
-    end
-end
+local U = require('snippets.common')
 
 local function get_snippet_list()
 
@@ -41,29 +35,32 @@ local function get_snippet_list()
     return snip_list
 end
 
+local function preview_advance(entry)
+    --getting current snippets template
+    local snip = snippet.lookup_snippet(entry.value.filetype,entry.value.name)
+    --we will evaulate them and get how many inputs are they need to fill
+    local evaluator = U.evaluate_snippet(snip)
+    local resolved_inputs = {}
+    for i = 0,#evaluator.inputs + 1 do
+        local ph  = "Placeholders"
+        if i > 1 then
+            ph = ph..'_'..i-1
+        end
+        resolved_inputs[i] = ph
+    end
+    local text = evaluator.evaluate_structure(resolved_inputs)
+    local lines = vim.split(table.concat(text), "\n", true)
+    return lines
+end
+
 local function show_preview(entry,buf)
     vim.api.nvim_buf_set_option(buf, "filetype", entry.value.filetype)
-    local snip = snippet.lookup_snippet(entry.value.filetype,entry.value.name)
-    local ux = require'snippets/inserters/vim_input'
-
-
-    local s = ux(snip)
-    --First we will remove any previously lines so it dont overlap with previous snip in case...
-    local max_line  = vim.api.nvim_buf_line_count(0)
-    for i = max_line,0,-1 do
-        vim.api.nvim_buf_set_lines(0,i,-1,false,{''})
-    end
-
-    --Once we done, we set offset max number, so we can skip all placeholder...
-    s.advance(math.pow(2,1024))
-    --since snippet will save to current screen but not to preview so we need to get all of that lines and paste to preview buffers
-    local complete = vim.api.nvim_buf_get_lines(0,0,999,false)
-    vim.api.nvim_buf_set_lines(buf, 0, -1, false, complete)
-
+    local line = preview_advance(entry)
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, line)
 end
 
 local function make_entry(entry)
-    --Create Display Area of telescope 
+    --Create Display Area of telescope
     local displayer = entry_display.create({
         separator = "▏",
         items = { { width = 20 }, { width = 20 }, { remaining = true } },
